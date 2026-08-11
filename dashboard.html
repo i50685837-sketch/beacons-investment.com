@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Beacons Investment</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #06110b;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    header {
+      height: 65px;
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0a1a11;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .brand {
+      color: #35d07f;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .menu {
+      font-size: 25px;
+      cursor: pointer;
+      background: none;
+      border: 0;
+      color: white;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 270px;
+      height: 100vh;
+      background: #081810;
+      border-right: 1px solid rgba(255,255,255,.08);
+      padding: 25px 18px;
+      transition: .3s;
+      z-index: 20;
+    }
+
+    .sidebar.open {
+      left: 0;
+    }
+
+    .side-title {
+      color: #35d07f;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+
+    .nav-item {
+      display: block;
+      padding: 14px;
+      margin-bottom: 7px;
+      border-radius: 10px;
+      color: #c1ccc6;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: rgba(53,208,127,.12);
+      color: #35d07f;
+    }
+
+    .logout {
+      color: #ff7777;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      z-index: 15;
+    }
+
+    .overlay.show {
+      display: block;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 25px 18px 60px;
+    }
+
+    .welcome {
+      margin-bottom: 25px;
+    }
+
+    .welcome h1 {
+      font-size: 28px;
+      margin-bottom: 7px;
+    }
+
+    .welcome p {
+      color: #8e9b94;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns:
+        repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      padding: 22px;
+      border-radius: 17px;
+      background: #0b1c13;
+      border: 1px solid rgba(255,255,255,.07);
+    }
+
+    .card small {
+      color: #829088;
+    }
+
+    .amount {
+      font-size: 27px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .green {
+      color: #35d07f;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns:
+        repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .action {
+      padding: 17px;
+      border-radius: 12px;
+      border: 0;
+      background: #35d07f;
+      color: #06110b;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .action.secondary {
+      background: #10251a;
+      color: white;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    .section {
+      margin-top: 30px;
+    }
+
+    .section h2 {
+      margin-bottom: 15px;
+    }
+
+    .panel {
+      padding: 22px;
+      border-radius: 17px;
+      background: #0b1c13;
+      border: 1px solid rgba(255,255,255,.07);
+    }
+
+    .panel input {
+      width: 100%;
+      margin: 10px 0;
+      padding: 14px;
+      background: #07130d;
+      color: white;
+      border: 1px solid #263b30;
+      border-radius: 9px;
+      outline: none;
+    }
+
+    .panel input:focus {
+      border-color: #35d07f;
+    }
+
+    .panel button {
+      width: 100%;
+      padding: 14px;
+      background: #35d07f;
+      border: 0;
+      border-radius: 9px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .message {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 9px;
+      font-size: 14px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 50px;
+      color: #35d07f;
+    }
+
+    @media (min-width: 900px) {
+      .menu {
+        display: none;
+      }
+
+      .sidebar {
+        left: 0;
+      }
+
+      main {
+        margin-left: 270px;
+      }
+
+      .overlay {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <button class="menu" id="menuBtn">☰</button>
+  <div class="brand">BEACONS INVESTMENT</div>
+  <div id="headerName">...</div>
+</header>
+
+<div class="overlay" id="overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+
+  <div class="side-title">
+    BEACONS
+  </div>
+
+  <a class="nav-item active">🏠 Dashboard</a>
+  <a class="nav-item">💰 Investments</a>
+  <a class="nav-item">💳 Transactions</a>
+  <a class="nav-item">📊 Investment Graph</a>
+  <a class="nav-item">🧮 Investment Calculator</a>
+  <a class="nav-item">👤 Profile</a>
+  <a class="nav-item">⚙️ Settings</a>
+
+  <a class="nav-item logout" id="logoutBtn">
+    🚪 Logout
+  </a>
+
+</aside>
+
+<main>
+
+  <div id="loading" class="loading">
+    Loading your account...
+  </div>
+
+  <div id="dashboard" style="display:none;">
+
+    <div class="welcome">
+      <h1>
+        Welcome, <span id="userName">User</span> 👋
+      </h1>
+
+      <p>
+        Here's an overview of your Beacons Investment account.
+      </p>
+    </div>
+
+
+    <!-- BALANCE CARDS -->
+
+    <div class="cards">
+
+      <div class="card">
+        <small>Total Balance</small>
+        <div class="amount green" id="balance">
+          KES 0.00
+        </div>
+      </div>
+
+      <div class="card">
+        <small>Invested Balance</small>
+        <div class="amount" id="investedBalance">
+          KES 0.00
+        </div>
+      </div>
+
+      <div class="card">
+        <small>Available Balance</small>
+        <div class="amount" id="availableBalance">
+          KES 0.00
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ACTIONS -->
+
+    <div class="actions">
+
+      <button class="action" onclick="showDeposit()">
+        💳 Deposit
+      </button>
+
+      <button
+        class="action secondary"
+        onclick="alert('Investment section coming next.')"
+      >
+        📈 Start Investing
+      </button>
+
+      <button
+        class="action secondary"
+        onclick="alert('Withdrawals will be connected to the backend.')"
+      >
+        💸 Withdraw
+      </button>
+
+    </div>
+
+
+    <!-- DEPOSIT -->
+
+    <section class="section" id="depositSection">
+
+      <h2>Make a Deposit</h2>
+
+      <div class="panel">
+
+        <p style="color:#8e9b94;">
+          Minimum deposit: KES 750
+        </p>
+
+        <input
+          type="number"
+          id="depositAmount"
+          placeholder="Enter amount"
+          min="750"
+        >
+
+        <button id="depositBtn">
+          Continue to Payment
+        </button>
+
+        <div id="depositMessage" class="message"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ACCOUNT -->
+
+    <section class="section">
+
+      <h2>Account</h2>
+
+      <div class="panel">
+
+        <p>
+          <strong>Name:</strong>
+          <span id="profileName">Loading...</span>
+        </p>
+
+        <br>
+
+        <p>
+          <strong>Email:</strong>
+          <span id="profileEmail">Loading...</span>
+        </p>
+
+        <br>
+
+        <p>
+          <strong>Phone:</strong>
+          <span id="profilePhone">Loading...</span>
+        </p>
+
+      </div>
+
+    </section>
+
+  </div>
+
+</main>
+
+
+<script>
+
+  // ==========================================
+  // API CONFIG
+  // ==========================================
+
+  const API_URL = "http://localhost:5000/api";
+
+  const token =
+    localStorage.getItem("beacons_token");
+
+
+  // ==========================================
+  // CHECK LOGIN
+  // ==========================================
+
+  if (!token) {
+
+    window.location.href = "login.html";
+
+  }
+
+
+  // ==========================================
+  // LOAD USER
+  // ==========================================
+
+  async function loadUser() {
+
+    try {
+
+      const response = await fetch(
+        `${API_URL}/auth/me`,
+        {
+          method: "GET",
+
+          headers: {
+            "Authorization":
+              `Bearer ${token}`
+          }
+        }
+      );
+
+
+      if (response.status === 401) {
+
+        localStorage.removeItem(
+          "beacons_token"
+        );
+
+        localStorage.removeItem(
+          "beacons_user"
+        );
+
+        window.location.href =
+          "login.html";
+
+        return;
+      }
+
+
+      const data =
+        await response.json();
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.message ||
+          "Unable to load account."
+        );
+
+      }
+
+
+      const user = data.user;
+
+
+      document.getElementById(
+        "userName"
+      ).textContent =
+        user.name || "User";
+
+
+      document.getElementById(
+        "headerName"
+      ).textContent =
+        user.name || "";
+
+
+      document.getElementById(
+        "profileName"
+      ).textContent =
+        user.name || "-";
+
+
+      document.getElementById(
+        "profileEmail"
+      ).textContent =
+        user.email || "-";
+
+
+      document.getElementById(
+        "profilePhone"
+      ).textContent =
+        user.phone || "-";
+
+
+      const balance =
+        Number(user.balance || 0);
+
+      const invested =
+        Number(user.investedBalance || 0);
+
+
+      document.getElementById(
+        "balance"
+      ).textContent =
+        formatMoney(balance);
+
+
+      document.getElementById(
+        "investedBalance"
+      ).textContent =
+        formatMoney(invested);
+
+
+      document.getElementById(
+        "availableBalance"
+      ).textContent =
+        formatMoney(
+          Math.max(balance - invested, 0)
+        );
+
+
+      document.getElementById(
+        "loading"
+      ).style.display = "none";
+
+
+      document.getElementById(
+        "dashboard"
+      ).style.display = "block";
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      document.getElementById(
+        "loading"
+      ).textContent =
+        "Unable to load your account.";
+
+    }
+
+  }
+
+
+  // ==========================================
+  // MONEY FORMAT
+  // ==========================================
+
+  function formatMoney(amount) {
+
+    return "KES " +
+      Number(amount).toLocaleString(
+        "en-KE",
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }
+      );
+
+  }
+
+
+  // ==========================================
+  // DEPOSIT
+  // ==========================================
+
+  async function createDeposit() {
+
+    const amount =
+      Number(
+        document.getElementById(
+          "depositAmount"
+        ).value
+      );
+
+
+    const message =
+      document.getElementById(
+        "depositMessage"
+      );
+
+
+    if (!amount || amount < 750) {
+
+      message.style.display = "block";
+
+      message.style.color = "#ff7777";
+
+      message.textContent =
+        "Minimum deposit is KES 750.";
+
+      return;
+
+    }
+
+
+    const button =
+      document.getElementById(
+        "depositBtn"
+      );
+
+
+    button.disabled = true;
+
+    button.textContent =
+      "Creating payment...";
+
+
+    try {
+
+      const response =
+        await fetch(
+          `${API_URL}/payment/deposit`,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+
+              "Authorization":
+                `Bearer ${token}`
+            },
+
+            body: JSON.stringify({
+              amount
+            })
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.message ||
+          "Payment request failed."
+        );
+
+      }
+
+
+      if (data.redirectUrl) {
+
+        window.location.href =
+          data.redirectUrl;
+
+        return;
+
+      }
+
+
+      message.style.display =
+        "block";
+
+      message.style.color =
+        "#35d07f";
+
+      message.textContent =
+        "Payment request created.";
+
+
+    } catch (error) {
+
+      message.style.display =
+        "block";
+
+      message.style.color =
+        "#ff7777";
+
+      message.textContent =
+        error.message;
+
+      button.disabled = false;
+
+      button.textContent =
+        "Continue to Payment";
+
+    }
+
+  }
+
+
+  document.getElementById(
+    "depositBtn"
+  ).addEventListener(
+    "click",
+    createDeposit
+  );
+
+
+  // ==========================================
+  // SIDEBAR
+  // ==========================================
+
+  const sidebar =
+    document.getElementById(
+      "sidebar"
+    );
+
+  const overlay =
+    document.getElementById(
+      "overlay"
+    );
+
+  document.getElementById(
+    "menuBtn"
+  ).addEventListener(
+    "click",
+    () => {
+
+      sidebar.classList.toggle(
+        "open"
+      );
+
+      overlay.classList.toggle(
+        "show"
+      );
+
+    }
+  );
+
+
+  overlay.addEventListener(
+    "click",
+    () => {
+
+      sidebar.classList.remove(
+        "open"
+      );
+
+      overlay.classList.remove(
+        "show"
+      );
+
+    }
+  );
+
+
+  // ==========================================
+  // LOGOUT
+  // ==========================================
+
+  document.getElementById(
+    "logoutBtn"
+  ).addEventListener(
+    "click",
+    () => {
+
+      localStorage.removeItem(
+        "beacons_token"
+      );
+
+      localStorage.removeItem(
+        "beacons_user"
+      );
+
+      window.location.href =
+        "login.html";
+
+    }
+  );
+
+
+  // ==========================================
+  // SHOW DEPOSIT
+  // ==========================================
+
+  function showDeposit() {
+
+    document.getElementById(
+      "depositSection"
+    ).scrollIntoView({
+      behavior: "smooth"
+    });
+
+  }
+
+
+  // ==========================================
+  // START
+  // ==========================================
+
+  loadUser();
+
+</script>
+
+</body>
+    </html>
