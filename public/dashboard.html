@@ -1213,4 +1213,857 @@ document.getElementById(
     overlay.classList.toggle("show");
 
 };
+           
+overlay.onclick = () => {
+
+    sidebar.classList.remove("open");
+
+    overlay.classList.remove("show");
+
+};
+
+
+/* ==========================================
+   SCROLL TO SECTION
+========================================== */
+
+function scrollToSection(id){
+
+    const element =
+        document.getElementById(id);
+
+    if(element){
+
+        element.scrollIntoView({
+            behavior:"smooth",
+            block:"start"
+        });
+
+    }
+
+    sidebar.classList.remove("open");
+
+    overlay.classList.remove("show");
+
+}
+
+
+/* ==========================================
+   THEME
+========================================== */
+
+function toggleTheme(){
+
+    document.body.classList.toggle("light");
+
+}
+
+
+/* ==========================================
+   LOGOUT
+========================================== */
+
+document.getElementById(
+    "logoutBtn"
+).onclick = () => {
+
+    localStorage.removeItem(
+        "beacons_token"
+    );
+
+    localStorage.removeItem(
+        "beacons_user"
+    );
+
+    window.location.href =
+        "login.html";
+
+};
+
+
+/* ==========================================
+   GRAPH
+========================================== */
+
+const canvas =
+    document.getElementById(
+        "progressGraph"
+    );
+
+const ctx =
+    canvas.getContext("2d");
+
+
+function drawGraph(){
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+    const dpr =
+        window.devicePixelRatio || 1;
+
+    canvas.width =
+        rect.width * dpr;
+
+    canvas.height =
+        rect.height * dpr;
+
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+
+    const width = rect.width;
+    const height = rect.height;
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    /* GRID */
+
+    ctx.strokeStyle =
+        "rgba(255,255,255,.07)";
+
+    ctx.lineWidth = 1;
+
+    for(
+        let y = 30;
+        y < height - 25;
+        y += 45
+    ){
+
+        ctx.beginPath();
+
+        ctx.moveTo(0,y);
+
+        ctx.lineTo(width,y);
+
+        ctx.stroke();
+
+    }
+
+
+    /* Y AXIS */
+
+    ctx.strokeStyle =
+        "rgba(255,255,255,.18)";
+
+    ctx.beginPath();
+
+    ctx.moveTo(35,0);
+
+    ctx.lineTo(35,height);
+
+    ctx.stroke();
+
+
+    /* X AXIS */
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        35,
+        height - 25
+    );
+
+    ctx.lineTo(
+        width,
+        height - 25
+    );
+
+    ctx.stroke();
+
+
+    /* SIMULATED PROGRESS */
+
+    const points = [
+        0.78,
+        0.70,
+        0.73,
+        0.63,
+        0.55,
+        0.47,
+        0.38,
+        0.30
+    ];
+
+
+    /* LINE */
+
+    ctx.beginPath();
+
+    points.forEach(
+        (point,index) => {
+
+            const x =
+                35 +
+                (
+                    index /
+                    (points.length - 1)
+                ) *
+                (width - 50);
+
+            const y =
+                point *
+                (height - 50);
+
+
+            if(index === 0){
+
+                ctx.moveTo(
+                    x,
+                    y
+                );
+
+            }else{
+
+                ctx.lineTo(
+                    x,
+                    y
+                );
+
+            }
+
+        }
+    );
+
+
+    ctx.strokeStyle =
+        "#32d47d";
+
+    ctx.lineWidth = 3;
+
+    ctx.stroke();
+
+
+    /* POINTS */
+
+    points.forEach(
+        (point,index) => {
+
+            const x =
+                35 +
+                (
+                    index /
+                    (points.length - 1)
+                ) *
+                (width - 50);
+
+            const y =
+                point *
+                (height - 50);
+
+
+            ctx.beginPath();
+
+            ctx.arc(
+                x,
+                y,
+                4,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fillStyle =
+                "#32d47d";
+
+            ctx.fill();
+
+        }
+    );
+
+
+    /* LABELS */
+
+    ctx.fillStyle =
+        "#718078";
+
+    ctx.font =
+        "11px Arial";
+
+    const labels = [
+        "Start",
+        "6h",
+        "12h",
+        "18h",
+        "24h",
+        "30h",
+        "36h",
+        "Now"
+    ];
+
+
+    labels.forEach(
+        (label,index) => {
+
+            const x =
+                35 +
+                (
+                    index /
+                    (labels.length - 1)
+                ) *
+                (width - 50);
+
+            ctx.fillText(
+                label,
+                x - 10,
+                height - 7
+            );
+
+        }
+    );
+
+}
+
+
+/* ==========================================
+   PROGRESS STATUS
+========================================== */
+
+function updateProgressStatus(){
+
+    const status =
+        document.getElementById(
+            "progressStatus"
+        );
+
+    if(!status) return;
+
+
+    status.className =
+        "status good";
+
+    status.textContent =
+        "● Progressing well";
+
+}
+
+
+/* ==========================================
+   TRANSACTION HISTORY
+========================================== */
+
+function loadTransactions(){
+
+    const container =
+        document.getElementById(
+            "transactions"
+        );
+
+    if(!container) return;
+
+
+    const transactions =
+        JSON.parse(
+            localStorage.getItem(
+                "beacons_transactions"
+            ) || "[]"
+        );
+
+
+    if(
+        transactions.length === 0
+    ){
+
+        container.innerHTML = `
+
+            <div class="transaction">
+
+                <div>
+
+                    <div class="tx-name">
+                        No transactions yet
+                    </div>
+
+                    <div class="tx-date">
+                        Your transactions will appear here.
+                    </div>
+
+                </div>
+
+                <div class="tx-amount">
+                    —
+                </div>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    transactions.forEach(
+        tx => {
+
+            const transaction =
+                document.createElement(
+                    "div"
+                );
+
+            transaction.className =
+                "transaction";
+
+
+            const debit =
+                tx.type === "debit";
+
+
+            const sign =
+                debit ? "-" : "+";
+
+
+            const amountColor =
+                debit
+                    ? "#ff5d67"
+                    : "#32d47d";
+
+
+            transaction.innerHTML = `
+
+                <div>
+
+                    <div class="tx-name">
+                        ${tx.name}
+                    </div>
+
+                    <div class="tx-date">
+                        ${new Date(
+                            tx.date
+                        ).toLocaleString()}
+                    </div>
+
+                </div>
+
+                <div
+                    class="tx-amount"
+                    style="color:${amountColor}"
+                >
+                    ${sign}${money(tx.amount)}
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                transaction
+            );
+
+        }
+    );
+
+}
+
+
+/* ==========================================
+   SAVE TRANSACTION
+========================================== */
+
+function saveTransaction(
+    name,
+    amount,
+    type
+){
+
+    const transactions =
+        JSON.parse(
+            localStorage.getItem(
+                "beacons_transactions"
+            ) || "[]"
+        );
+
+
+    transactions.unshift({
+
+        name:name,
+
+        amount:amount,
+
+        type:type,
+
+        date:
+            new Date().toISOString()
+
+    });
+
+
+    localStorage.setItem(
+        "beacons_transactions",
+        JSON.stringify(
+            transactions
+        )
+    );
+
+}
+
+
+/* ==========================================
+   START INVESTMENT
+========================================== */
+
+function startInvestment(){
+
+    const input =
+        document.getElementById(
+            "investAmount"
+        );
+
+
+    const amount =
+        Number(input.value);
+
+
+    if(!amount){
+
+        alert(
+            "Please enter an investment amount."
+        );
+
+        return;
+
+    }
+
+
+    if(amount < 850){
+
+        alert(
+            "Minimum investment is KES 850."
+        );
+
+        return;
+
+    }
+
+
+    saveTransaction(
+        "Investment Started",
+        amount,
+        "debit"
+    );
+
+
+    loadTransactions();
+
+
+    input.value = "";
+
+
+    alert(
+        `Investment request created for ${money(amount)}.`
+    );
+
+}
+
+
+/* ==========================================
+   DEPOSIT
+========================================== */
+
+async function deposit(){
+
+    const input =
+        document.getElementById(
+            "depositAmount"
+        );
+
+
+    const amount =
+        Number(input.value);
+
+
+    if(amount < 750){
+
+        alert(
+            "Minimum deposit is KES 750."
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+                `${API_URL}/payment/deposit`,
+                {
+
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${token}`
+                    },
+
+                    body:
+                        JSON.stringify({
+                            amount:amount
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if(!response.ok){
+
+            throw new Error(
+                data.message ||
+                "Deposit request failed"
+            );
+
+        }
+
+
+        alert(
+            data.message ||
+            "Deposit request created."
+        );
+
+
+        input.value = "";
+
+
+    }catch(error){
+
+        console.error(
+            "Deposit error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Unable to process deposit."
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   WITHDRAW
+========================================== */
+
+function withdraw(){
+
+    const amount =
+        prompt(
+            "Enter withdrawal amount:"
+        );
+
+
+    if(!amount) return;
+
+
+    const value =
+        Number(amount);
+
+
+    if(
+        !Number.isFinite(value) ||
+        value <= 0
+    ){
+
+        alert(
+            "Enter a valid amount."
+        );
+
+        return;
+
+    }
+
+
+    alert(
+        "Withdrawal request will be connected to the backend."
+    );
+
+}
+
+
+/* ==========================================
+   CALCULATOR
+========================================== */
+
+function calculate(){
+
+    const amountInput =
+        document.getElementById(
+            "calcAmount"
+        );
+
+    const hoursInput =
+        document.getElementById(
+            "calcHours"
+        );
+
+
+    if(
+        !amountInput ||
+        !hoursInput
+    ){
+
+        return;
+
+    }
+
+
+    let amount =
+        Number(
+            amountInput.value
+        );
+
+
+    const hours =
+        Number(
+            hoursInput.value
+        );
+
+
+    if(amount < 850){
+
+        amount = 850;
+
+    }
+
+
+    /*
+      Example projection only.
+      850 -> 210 at 3 hours.
+    */
+
+    const baseRate =
+        210 / 850;
+
+
+    const hourlyFactor =
+        Math.sqrt(
+            hours / 3
+        );
+
+
+    const profit =
+        Math.round(
+            amount *
+            baseRate *
+            hourlyFactor
+        );
+
+
+    const total =
+        amount + profit;
+
+
+    const profitElement =
+        document.getElementById(
+            "calcProfit"
+        );
+
+    const totalElement =
+        document.getElementById(
+            "calcTotal"
+        );
+
+
+    if(profitElement){
+
+        profitElement.textContent =
+            money(profit);
+
+    }
+
+
+    if(totalElement){
+
+        totalElement.textContent =
+            money(total);
+
+    }
+
+}
+
+
+/* ==========================================
+   CALCULATOR EVENTS
+========================================== */
+
+const calcAmount =
+    document.getElementById(
+        "calcAmount"
+    );
+
+const calcHours =
+    document.getElementById(
+        "calcHours"
+    );
+
+
+if(calcAmount){
+
+    calcAmount.addEventListener(
+        "input",
+        calculate
+    );
+
+}
+
+
+if(calcHours){
+
+    calcHours.addEventListener(
+        "change",
+        calculate
+    );
+
+}
+
+
+/* ==========================================
+   WINDOW RESIZE
+========================================== */
+
+window.addEventListener(
+    "resize",
+    drawGraph
+);
+
+
+/* ==========================================
+   INITIALIZE
+========================================== */
+
+loadTransactions();
+
+updateProgressStatus();
+
+calculate();
+
+drawGraph();
+
+</script>
+
+</body>
+</html>
+    
   
