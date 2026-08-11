@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beacons Investment</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #07120d;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    header {
+      width: 100%;
+      padding: 18px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(7, 18, 13, 0.95);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 21px;
+      font-weight: 800;
+      color: #35d07f;
+    }
+
+    .menu-btn {
+      background: #35d07f;
+      color: #06100b;
+      border: none;
+      padding: 10px 17px;
+      border-radius: 9px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .hero {
+      min-height: 85vh;
+      padding: 70px 7%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+      background:
+        radial-gradient(circle at 80% 30%, rgba(53,208,127,.18), transparent 35%),
+        radial-gradient(circle at 20% 70%, rgba(20,120,70,.12), transparent 35%);
+    }
+
+    .hero-content {
+      max-width: 620px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border: 1px solid rgba(53,208,127,.4);
+      color: #35d07f;
+      border-radius: 30px;
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: clamp(42px, 8vw, 75px);
+      line-height: 1;
+      margin-bottom: 22px;
+    }
+
+    h1 span {
+      color: #35d07f;
+    }
+
+    .hero p {
+      color: #aab8b0;
+      font-size: 17px;
+      line-height: 1.7;
+      margin-bottom: 30px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      text-decoration: none;
+      padding: 14px 24px;
+      border-radius: 10px;
+      font-weight: bold;
+      display: inline-block;
+    }
+
+    .primary {
+      background: #35d07f;
+      color: #06100b;
+    }
+
+    .secondary {
+      border: 1px solid rgba(255,255,255,.15);
+      color: white;
+      background: rgba(255,255,255,.04);
+    }
+
+    .card {
+      width: 330px;
+      padding: 25px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: 0 25px 70px rgba(0,0,0,.3);
+    }
+
+    .card-title {
+      color: #9ca9a1;
+      font-size: 14px;
+    }
+
+    .balance {
+      font-size: 34px;
+      margin: 10px 0;
+      font-weight: 800;
+    }
+
+    .growth {
+      color: #35d07f;
+      margin-bottom: 25px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .stat {
+      padding: 15px;
+      background: rgba(0,0,0,.2);
+      border-radius: 12px;
+    }
+
+    .stat small {
+      color: #87948c;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 7px;
+    }
+
+    section {
+      padding: 70px 7%;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .section-title h2 {
+      font-size: 34px;
+      margin-bottom: 10px;
+    }
+
+    .section-title p {
+      color: #8e9d94;
+    }
+
+    .plans {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .plan {
+      padding: 25px;
+      border-radius: 18px;
+      background: #0c1d14;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .plan h3 {
+      margin-bottom: 15px;
+    }
+
+    .amount {
+      font-size: 27px;
+      font-weight: bold;
+      color: #35d07f;
+      margin-bottom: 12px;
+    }
+
+    .plan p {
+      color: #9ba8a1;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px;
+    }
+
+    .feature {
+      text-align: center;
+      padding: 25px;
+      background: #0b1b13;
+      border-radius: 16px;
+    }
+
+    .icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .feature p {
+      color: #8f9c95;
+      margin-top: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    footer {
+      padding: 30px 7%;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: #78857e;
+      font-size: 13px;
+    }
+
+    @media (max-width: 800px) {
+      .hero {
+        flex-direction: column;
+        text-align: center;
+        padding-top: 55px;
+      }
+
+      .buttons {
+        justify-content: center;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 350px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">BEACONS INVESTMENT</div>
+  <button class="menu-btn" onclick="location.href='login.html'">
+    Login
+  </button>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="hero-content">
+
+      <div class="badge">✦ Smart Investment Platform</div>
+
+      <h1>
+        Grow Your Money<br>
+        With <span>Beacons.</span>
+      </h1>
+
+      <p>
+        Manage your investments, monitor your balance and
+        keep track of your financial goals from one simple platform.
+      </p>
+
+      <div class="buttons">
+        <a href="register.html" class="btn primary">
+          Create Account
+        </a>
+
+        <a href="login.html" class="btn secondary">
+          Login
+        </a>
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <div class="card-title">Portfolio Balance</div>
+
+      <div class="balance">KES 0.00</div>
+
+      <div class="growth">↑ Start your investment journey</div>
+
+      <div class="stats">
+        <div class="stat">
+          <small>Invested</small>
+          <strong>KES 0.00</strong>
+        </div>
+
+        <div class="stat">
+          <small>Profit</small>
+          <strong>KES 0.00</strong>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+
+    <div class="section-title">
+      <h2>Investment Plans</h2>
+      <p>Choose a plan that matches your investment goals.</p>
+    </div>
+
+    <div class="plans">
+
+      <div class="plan">
+        <h3>Starter</h3>
+        <div class="amount">KES 750+</div>
+        <p>
+          Designed for users beginning their investment journey.
+        </p>
+      </div>
+
+      <div class="plan">
+        <h3>Growth</h3>
+        <div class="amount">KES 2,500+</div>
+        <p>
+          A higher investment level for users seeking greater growth.
+        </p>
+      </div>
+
+      <div class="plan">
+        <h3>Premium</h3>
+        <div class="amount">KES 10,000+</div>
+        <p>
+          For larger portfolios and long-term investment goals.
+        </p>
+      </div>
+
+    </div>
+
+  </section>
+
+  <section>
+
+    <div class="section-title">
+      <h2>Why Beacons?</h2>
+      <p>Everything you need in one place.</p>
+    </div>
+
+    <div class="features">
+
+      <div class="feature">
+        <div class="icon">📊</div>
+        <h3>Track Investments</h3>
+        <p>
+          Monitor your investment balance and portfolio activity.
+        </p>
+      </div>
+
+      <div class="feature">
+        <div class="icon">🔐</div>
+        <h3>Secure Account</h3>
+        <p>
+          Your account information is protected with modern security.
+        </p>
+      </div>
+
+      <div class="feature">
+        <div class="icon">💰</div>
+        <h3>Easy Deposits</h3>
+        <p>
+          Manage deposits and withdrawals through your account.
+        </p>
+      </div>
+
+      <div class="feature">
+        <div class="icon">📱</div>
+        <h3>Mobile Friendly</h3>
+        <p>
+          Access your dashboard comfortably from your phone.
+        </p>
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  © 2026 Beacons Investment. All rights reserved.
+</footer>
+
+</body>
+  </html>
