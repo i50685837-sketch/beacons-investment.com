@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | Beacons Investment</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background:
+        radial-gradient(circle at top right, #123c28, transparent 40%),
+        #06110b;
+      color: white;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 430px;
+      padding: 30px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 22px;
+      backdrop-filter: blur(15px);
+    }
+
+    .logo {
+      text-align: center;
+      color: #35d07f;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #91a097;
+      margin-bottom: 28px;
+    }
+
+    .input-group {
+      margin-bottom: 17px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+      color: #c8d2cd;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #263b30;
+      background: #0b1d13;
+      color: white;
+      outline: none;
+      font-size: 15px;
+    }
+
+    input:focus {
+      border-color: #35d07f;
+    }
+
+    .terms {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin: 18px 0;
+      color: #9ba8a1;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .terms input {
+      width: auto;
+      margin-top: 3px;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 11px;
+      background: #35d07f;
+      color: #06110b;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .message {
+      display: none;
+      padding: 12px;
+      border-radius: 9px;
+      margin-bottom: 16px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .login {
+      text-align: center;
+      margin-top: 22px;
+      color: #8f9c95;
+      font-size: 14px;
+    }
+
+    .login a {
+      color: #35d07f;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="logo">BEACONS INVESTMENT</div>
+  <p class="subtitle">Create your investment account</p>
+
+  <div id="message" class="message"></div>
+
+  <form id="registerForm">
+
+    <div class="input-group">
+      <label for="name">Full Name</label>
+      <input
+        type="text"
+        id="name"
+        name="name"
+        placeholder="Enter your full name"
+        required
+      >
+    </div>
+
+    <div class="input-group">
+      <label for="phone">Phone Number</label>
+      <input
+        type="tel"
+        id="phone"
+        name="phone"
+        placeholder="07XXXXXXXX"
+        required
+      >
+    </div>
+
+    <div class="input-group">
+      <label for="email">Email Address</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        placeholder="you@example.com"
+        required
+      >
+    </div>
+
+    <div class="input-group">
+      <label for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        placeholder="Create a password"
+        minlength="8"
+        required
+      >
+    </div>
+
+    <div class="input-group">
+      <label for="confirmPassword">Confirm Password</label>
+      <input
+        type="password"
+        id="confirmPassword"
+        placeholder="Repeat your password"
+        minlength="8"
+        required
+      >
+    </div>
+
+    <label class="terms">
+      <input type="checkbox" id="terms" required>
+      <span>
+        I agree to the Beacons Investment terms and conditions.
+      </span>
+    </label>
+
+    <button type="submit" id="registerBtn">
+      Create Account
+    </button>
+
+  </form>
+
+  <div class="login">
+    Already have an account?
+    <a href="login.html">Login</a>
+  </div>
+
+</div>
+
+<script>
+  /*
+    IMPORTANT:
+    Do NOT put JWT_SECRET, AUTH_SECRET,
+    MongoDB passwords, or other private secrets here.
+
+    This URL should point to your backend.
+  */
+
+  const API_URL = "http://localhost:5000/api";
+
+  const form = document.getElementById("registerForm");
+  const button = document.getElementById("registerBtn");
+  const message = document.getElementById("message");
+
+  function showMessage(text, success = false) {
+    message.style.display = "block";
+    message.textContent = text;
+
+    message.style.background = success
+      ? "rgba(53,208,127,.15)"
+      : "rgba(255,70,70,.15)";
+
+    message.style.color = success
+      ? "#35d07f"
+      : "#ff7777";
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword =
+      document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+      showMessage("Passwords do not match.");
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Creating account...";
+
+    try {
+      const response = await fetch(
+        `${API_URL}/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name,
+            phone,
+            email,
+            password
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Registration failed."
+        );
+      }
+
+      showMessage(
+        "Account created successfully. Redirecting...",
+        true
+      );
+
+      /*
+        If your backend returns a token after registration,
+        you can store it here.
+
+        localStorage.setItem("token", data.token);
+      */
+
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 1200);
+
+    } catch (error) {
+      showMessage(
+        error.message || "Unable to connect to server."
+      );
+
+      button.disabled = false;
+      button.textContent = "Create Account";
+    }
+  });
+</script>
+
+</body>
+        </html>
