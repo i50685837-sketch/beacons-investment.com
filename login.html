@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Beacons Investment</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background:
+        radial-gradient(circle at top right, #123c28, transparent 40%),
+        #06110b;
+      color: white;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 430px;
+      padding: 32px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 22px;
+      backdrop-filter: blur(15px);
+    }
+
+    .logo {
+      text-align: center;
+      color: #35d07f;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #91a097;
+      margin-bottom: 28px;
+    }
+
+    .input-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      color: #c8d2cd;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #263b30;
+      background: #0b1d13;
+      color: white;
+      outline: none;
+      font-size: 15px;
+    }
+
+    input:focus {
+      border-color: #35d07f;
+    }
+
+    .forgot {
+      display: block;
+      text-align: right;
+      margin: -5px 0 20px;
+      color: #35d07f;
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 11px;
+      background: #35d07f;
+      color: #06110b;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .message {
+      display: none;
+      padding: 12px;
+      border-radius: 9px;
+      margin-bottom: 16px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .register {
+      text-align: center;
+      margin-top: 23px;
+      color: #8f9c95;
+      font-size: 14px;
+    }
+
+    .register a {
+      color: #35d07f;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      color: #718078;
+      font-size: 13px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="logo">BEACONS INVESTMENT</div>
+
+  <p class="subtitle">
+    Welcome back. Login to your account.
+  </p>
+
+  <div id="message" class="message"></div>
+
+  <form id="loginForm">
+
+    <div class="input-group">
+      <label for="email">Email Address</label>
+
+      <input
+        type="email"
+        id="email"
+        placeholder="you@example.com"
+        autocomplete="email"
+        required
+      >
+    </div>
+
+    <div class="input-group">
+      <label for="password">Password</label>
+
+      <input
+        type="password"
+        id="password"
+        placeholder="Enter your password"
+        autocomplete="current-password"
+        required
+      >
+    </div>
+
+    <a href="forgot-password.html" class="forgot">
+      Forgot password?
+    </a>
+
+    <button type="submit" id="loginBtn">
+      Login
+    </button>
+
+  </form>
+
+  <div class="register">
+    Don't have an account?
+    <a href="register.html">Create Account</a>
+  </div>
+
+  <a href="index.html" class="back">
+    ← Back to Beacons Investment
+  </a>
+
+</div>
+
+<script>
+  /*
+    IMPORTANT:
+    Never put AUTH_SECRET / JWT_SECRET here.
+
+    Your backend must handle the secret.
+
+    Local development:
+      http://localhost:5000/api
+
+    Production:
+      Change this to your deployed backend URL.
+  */
+
+  const API_URL = "http://localhost:5000/api";
+
+  const form = document.getElementById("loginForm");
+  const button = document.getElementById("loginBtn");
+  const message = document.getElementById("message");
+
+  function showMessage(text, success = false) {
+    message.style.display = "block";
+    message.textContent = text;
+
+    if (success) {
+      message.style.background = "rgba(53,208,127,.15)";
+      message.style.color = "#35d07f";
+    } else {
+      message.style.background = "rgba(255,70,70,.15)";
+      message.style.color = "#ff7777";
+    }
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    const password =
+      document.getElementById("password").value;
+
+    if (!email || !password) {
+      showMessage("Please enter your email and password.");
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Logging in...";
+
+    try {
+
+      const response = await fetch(
+        `${API_URL}/auth/login`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            email,
+            password
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Invalid login details."
+        );
+      }
+
+      /*
+        Expected backend response:
+
+        {
+          "message": "Login successful",
+          "token": "JWT_TOKEN",
+          "user": {
+            "id": "...",
+            "name": "...",
+            "email": "..."
+          }
+        }
+      */
+
+      if (!data.token) {
+        throw new Error(
+          "Login succeeded but no authentication token was returned."
+        );
+      }
+
+      // Save authentication token.
+      localStorage.setItem(
+        "beacons_token",
+        data.token
+      );
+
+      // Save basic user information.
+      if (data.user) {
+        localStorage.setItem(
+          "beacons_user",
+          JSON.stringify(data.user)
+        );
+      }
+
+      showMessage(
+        "Login successful. Opening dashboard...",
+        true
+      );
+
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 800);
+
+    } catch (error) {
+
+      console.error("Login error:", error);
+
+      showMessage(
+        error.message ||
+        "Unable to connect to the authentication server."
+      );
+
+      button.disabled = false;
+      button.textContent = "Login";
+    }
+  });
+</script>
+
+</body>
+    </html>
